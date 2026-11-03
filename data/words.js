@@ -1,8 +1,3 @@
-// Wordle word lists (5-letter, lowercase).
-// ANSWERS: 2315 words that can be the secret word.
-// ALLOWED_GUESSES: 10657 additional words accepted as guesses only.
-// VALID_WORDS: all 12972 words accepted as a guess (answers + allowed).
-
 export const ANSWERS = [
   "aback", "abase", "abate", "abbey", "abbot", "abhor", "abide", "abled", "abode", "abort",
   "about", "above", "abuse", "abyss", "acorn", "acrid", "actor", "acute", "adage", "adapt",

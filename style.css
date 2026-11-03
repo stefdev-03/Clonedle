@@ -47,8 +47,8 @@ hr {
 
 .present {
     background-color: yellow;
-    color: black;
-    border-color: goldenrod;
+    color: white;
+    border-color: rgb(184, 187, 25);
 }
 
 .absent {

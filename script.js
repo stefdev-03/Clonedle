@@ -28,7 +28,6 @@ function initialize(){
     document.addEventListener("keyup", (e) => {
         if (gameOver) return;
         
-        // alert(e.code);
         if ("KeyA" <= e.code && e.code <= "KeyZ"){
             if (col < width){
                 let currentTile = document.getElementById(row.toString() + "-" + col.toString());
@@ -80,8 +79,7 @@ function showMessage(msg){
 
 function getGuess(){
     let guess = "";
-    for (let c = 0; c < width; c++)
-    {
+    for (let c = 0; c < width; c++){
         guess += document.getElementById(row.toString() + "-" + c.toString()).innerText;
     }
     return guess.toLowerCase();
@@ -89,6 +87,17 @@ function getGuess(){
 
 function update(){
     let correct = 0;
+
+    let letterCount = {};
+    for (let i = 0; i < word.length; i++){
+        let letter = word[i];
+        if (letterCount[letter]){
+            letterCount[letter] += 1;
+        } else {
+            letterCount[letter] = 1;
+        }
+    }
+
     for (let c = 0; c < width; c++){
         let currentTile = document.getElementById(row.toString() + "-" + c.toString());
         let letter = currentTile.innerText;
@@ -96,14 +105,25 @@ function update(){
         if (word[c] == letter){
             currentTile.classList.add("correct");
             correct += 1;
-        } else if (word.includes(letter)){
+            letterCount[letter] -= 1;
+        }
+    }
+
+    for (let c = 0; c < width; c++){
+        let currentTile = document.getElementById(row.toString() + "-" + c.toString());
+        let letter = currentTile.innerText;
+
+        if (currentTile.classList.contains("correct")) continue;
+
+        if (letterCount[letter] > 0){
             currentTile.classList.add("present");
+            letterCount[letter] -= 1;
         } else {
             currentTile.classList.add("absent");
         }
-
-        if (correct == width){
-            gameOver = true;
-        }
+    }
+    
+    if (correct == width){
+        gameOver = true;
     }
 }

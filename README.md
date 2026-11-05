@@ -1,3 +1,3 @@
 # Clondle
 
-A web game based off of the popular *Wordle* (work in progress)
+A web game that is heavily inspired by the popular game *Wordle* (work in progress)

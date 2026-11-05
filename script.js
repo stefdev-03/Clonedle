@@ -65,6 +65,11 @@ function initialize(){
             document.getElementById("answer").innerText = word;
         }
     })
+
+    document.getElementById("reset").addEventListener("click", (e) => {
+        resetGame();
+        e.currentTarget.blur();
+    });    
 }
 
 function showMessage(msg){
@@ -75,6 +80,23 @@ function showMessage(msg){
     messageTimeout = setTimeout(() => {
         el.innerText = "";
     }, 2000);
+}
+
+function resetGame(){
+    for (let r = 0; r < height; r++){
+        for (let c = 0; c < width; c++){
+            let currentTile = document.getElementById(r.toString() + "-" + c.toString());
+            currentTile.innerText = "";
+            currentTile.classList.remove("correct", "present", "absent");
+        }
+    }
+
+    row = 0;
+    col = 0;
+    gameOver = false;
+    word = ANSWERS[Math.floor(Math.random() * ANSWERS.length)].toUpperCase();
+    clearTimeout(messageTimeout);
+    document.getElementById("answer").innerText = "";
 }
 
 function getGuess(){
@@ -125,5 +147,6 @@ function update(){
     
     if (correct == width){
         gameOver = true;
+        showMessage("You guessed it!");
     }
 }

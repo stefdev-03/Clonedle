@@ -1,6 +1,32 @@
+:root {
+    color-scheme: dark;
+    --background-color: #0A0A0A;
+    --text-color: #E8E8E8;
+    --letter-color: #E8E8E8;
+    --text-muted: #9A9A9A;
+    --border-color: #3A3A3C;
+    --correct-color: #538D4E;
+    --present-color: #B59F3B;
+    --absent-color: #3A3A3C;
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+    --background-color: #FFFFFF;
+    --text-color: #1A1A1B;
+    --letter-color: #E8E8E8;
+    --text-muted: #6B6B6B;
+    --border-color: #D3D6DA;
+    --correct-color: #6AAA64;
+    --present-color: #C9B458;
+    --absent-color: #787C7E;
+}
+
 body {
     font-family: Arial, sans-serif;
     text-align: center;
+    background-color: var(--background-color);
+    color: var(--text-color);
 }
 
 hr {
@@ -18,12 +44,14 @@ hr {
     display: inline-block;
 }
 
-#reset {
+#controls {
     position: absolute;
     left: 100%;
     top: 50%;
     transform: translateY(-50%);
     margin-left: 12px;
+    display: flex;
+    gap: 10px;
 }
 
 #board {
@@ -50,7 +78,7 @@ hr {
     justify-content: center;
     align-items: center;
     padding: 0;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
     transition: box-shadow 0.3s ease; 
 }
 
@@ -62,17 +90,18 @@ hr {
     display: block;
     width: 20px;
     height: 20px;
+    filter: invert(1);
 }
 
 .tile {
     /* For the boxes */
-    border: 2px solid lightgray;
+    border: 2px solid var(--border-color);
     width: 60px;
     height: 60px;
     margin: 2.5px;
 
     /* For the text inside the boxes */
-    color: black;
+    color: var(--text-color);
     font-size: 36px;
     font-weight: bold;
     display: flex;
@@ -81,19 +110,19 @@ hr {
 }
 
 .correct {
-    background-color: green;
-    color: white;
-    border-color: darkgreen;
+    background-color: var(--correct-color);
+    color: var(--letter-color);
+    border-color: var(--correct-color);
 }
 
 .present {
-    background-color: yellow;
-    color: white;
-    border-color: rgb(184, 187, 25);
+    background-color: var(--present-color);
+    color: var(--letter-color);
+    border-color: var(--present-color);
 }
 
 .absent {
-    background-color: gray;
-    color: white;
-    border-color: darkgray;
+    background-color: var(--absent-color);
+    color: var(--letter-color);
+    border-color: var(--absent-color);
 }

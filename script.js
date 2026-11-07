@@ -1,166 +1,74 @@
-import { ANSWERS, VALID_SET } from "./data/words.js";
+import { height, width, pickRandomWord, isValidWord, scoreGuess} from "./game.js";
+import { toggleTheme} from "./themes.js";
+import { showMessage, clearMessage, showAnswer } from "./message.js";
+import { createBoard, setLetter, getRowWord, colorRow, clearBoard} from "./board.js";
 
-var height = 6;
-var width = 5;
-
-var row = 0;
-var col = 0;
-
-let messageTimeout;
-var gameOver = false;
-var word = ANSWERS[Math.floor(Math.random() * ANSWERS.length)].toUpperCase();
+let row = 0;
+let col = 0;
+let gameOver = false;
+let word = pickRandomWord();
 
 window.onload = function(){
-    initialize();
-}
-
-function initialize(){
-    for (let r = 0; r < height; r++){
-        for (let c = 0; c < width; c++){
-            let tile = document.createElement("span");
-            tile.id = r.toString() + "-" + c.toString();
-            tile.classList.add("tile");
-            tile.innerText = "";
-            document.getElementById("board").appendChild(tile);
-        }
-    }
-
-    document.addEventListener("keyup", (e) => {
-        if (gameOver) return;
-        
-        if ("KeyA" <= e.code && e.code <= "KeyZ"){
-            if (col < width){
-                let currentTile = document.getElementById(row.toString() + "-" + col.toString());
-                if (currentTile.innerText == ""){
-                    currentTile.innerText = e.code[3];
-                    col += 1;
-                }
-            }
-        }
-        else if (e.code == "Backspace"){
-            if (0 < col && col <= width){
-                col -= 1;
-            }
-            let currentTile = document.getElementById(row.toString() + "-" + col.toString());
-            currentTile.innerText = "";
-        }
-
-        else if (e.code == "Enter"){
-            if (col < width) {
-                showMessage("Not enough letters");
-                return;
-            }
-            if (!VALID_SET.has(getGuess())){
-                showMessage("Not a valid word");
-                return;
-            }
-            update();
-            row += 1;
-            col = 0;
-        }
-
-        if (!gameOver && row == height){
-            gameOver = true;
-            clearTimeout(messageTimeout);
-            document.getElementById("answer").innerText = word;
-        }
-    })
-
+    createBoard();
+    document.addEventListener("keyup", handleKey);
     document.getElementById("reset").addEventListener("click", (e) => {
         resetGame();
         e.currentTarget.blur();
     });
+    toggleTheme();
+};
 
-    applyTheme(localStorage.getItem("theme") || "light");
+function handleKey(e){
+    if (gameOver) return;
 
-    document.getElementById("theme-toggle").addEventListener("click", (e) => {
-        const currentTheme = document.documentElement.dataset.theme;
-        applyTheme(currentTheme === "dark" ? "light" : "dark");
-        e.currentTarget.blur();
-    });
+    if ("KeyA" <= e.code && e.code <= "KeyZ"){
+        if (col < width){
+            setLetter(row, col, e.code[3]);
+            col++;
+        }
+    }
+    else if (e.code == "Backspace"){
+        if (col > 0){
+            col--;
+            setLetter(row, col, "");
+        }
+    }
+    else if (e.code == "Enter"){
+        submitGuess();
+    }
 }
 
-function applyTheme(theme){
-    document.documentElement.dataset.theme = theme;
-    document.getElementById("theme-toggle").innerText = theme == "dark" ? "☀️" : "🌙";
-    localStorage.setItem("theme", theme);
-}
+function submitGuess(){
+    if (col < width){
+        return showMessage("Not enough letters");
+    }
 
-function showMessage(msg){
-    let el = document.getElementById("answer");
-    el.innerText = msg;
+    const guess = getRowWord(row);
+    if (!isValidWord(guess)){
+        return showMessage("Not a valid word")
+    }
 
-    clearTimeout(messageTimeout);
-    messageTimeout = setTimeout(() => {
-        el.innerText = "";
-    }, 2000);
+    const result = scoreGuess(guess, word);
+    colorRow(row, result);
+
+    if (result.every(r => r === "correct")){
+        gameOver = true;
+        return;
+    }
+
+    row++
+    col = 0;
+    if (row == height){
+        gameOver = true;
+        showAnswer(word);
+    }
 }
 
 function resetGame(){
-    for (let r = 0; r < height; r++){
-        for (let c = 0; c < width; c++){
-            let currentTile = document.getElementById(r.toString() + "-" + c.toString());
-            currentTile.innerText = "";
-            currentTile.classList.remove("correct", "present", "absent");
-        }
-    }
-
+    clearBoard();
     row = 0;
     col = 0;
     gameOver = false;
-    word = ANSWERS[Math.floor(Math.random() * ANSWERS.length)].toUpperCase();
-    clearTimeout(messageTimeout);
-    document.getElementById("answer").innerText = "";
-}
-
-function getGuess(){
-    let guess = "";
-    for (let c = 0; c < width; c++){
-        guess += document.getElementById(row.toString() + "-" + c.toString()).innerText;
-    }
-    return guess.toLowerCase();
-}
-
-function update(){
-    let correct = 0;
-
-    let letterCount = {};
-    for (let i = 0; i < word.length; i++){
-        let letter = word[i];
-        if (letterCount[letter]){
-            letterCount[letter] += 1;
-        } else {
-            letterCount[letter] = 1;
-        }
-    }
-
-    for (let c = 0; c < width; c++){
-        let currentTile = document.getElementById(row.toString() + "-" + c.toString());
-        let letter = currentTile.innerText;
-
-        if (word[c] == letter){
-            currentTile.classList.add("correct");
-            correct += 1;
-            letterCount[letter] -= 1;
-        }
-    }
-
-    for (let c = 0; c < width; c++){
-        let currentTile = document.getElementById(row.toString() + "-" + c.toString());
-        let letter = currentTile.innerText;
-
-        if (currentTile.classList.contains("correct")) continue;
-
-        if (letterCount[letter] > 0){
-            currentTile.classList.add("present");
-            letterCount[letter] -= 1;
-        } else {
-            currentTile.classList.add("absent");
-        }
-    }
-    
-    if (correct == width){
-        gameOver = true;
-        showMessage("You guessed it!");
-    }
+    word = pickRandomWord();
+    clearMessage();
 }
